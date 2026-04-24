@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>Login</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,62 +22,55 @@
             width: 300px;
             text-align: center;
         }
-        h2 {
-            margin-bottom: 20px;
-            color: #333;
-        }
+        h2 { margin-bottom: 20px; color: #333; }
         input[type="text"], input[type="password"] {
-            width: 90%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            width: 90%; padding: 10px; margin: 10px 0;
+            border: 1px solid #ccc; border-radius: 4px;
         }
         button {
-            width: 100%;
-            padding: 10px;
-            background-color: #0056b3;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
+            width: 100%; padding: 10px; background-color: #0056b3;
+            color: white; border: none; border-radius: 4px;
+            cursor: pointer; font-size: 16px; margin-top: 10px;
         }
-        button:hover {
-            background-color: #004494;
-        }
-        #message {
-            margin-top: 15px;
-            font-weight: bold;
-        }
+        button:hover { background-color: #004494; }
+        #message { margin-top: 15px; font-weight: bold; }
+        .signup-link { margin-top: 20px; font-size: 14px; }
+        .signup-link a { color: #0056b3; text-decoration: none; }
+        .signup-link a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <div class="login-container">
-        <h2>Admin Login</h2>
+        <h2>Login</h2>
         <input type="text" id="username" placeholder="Username">
         <input type="password" id="password" placeholder="Password">
         <button onclick="attemptLogin()">Login</button>
         <div id="message"></div>
+        
+        <div class="signup-link">
+            Don't have an account? <a href="up.html">Sign Up here</a>
+        </div>
     </div>
 
     <script>
         function attemptLogin() {
-            // Get the values from the input fields
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
             const messageDiv = document.getElementById('message');
 
-            // Check against the hardcoded credentials
+            // 1. Check the hardcoded Admin credentials
             if (user === 'Adminconfig' && pass === 'Burtle@123') {
                 messageDiv.style.color = 'green';
-                messageDiv.innerText = 'Login successful!';
-                
-                // Optional: Redirect the user to another page upon success
-                // window.location.href = "welcome.html";
-            } else {
+                messageDiv.innerText = 'Admin Login successful!';
+            } 
+            // 2. Check if the user exists in Local Storage (simulated database)
+            else if (localStorage.getItem(user) === pass) {
+                messageDiv.style.color = 'green';
+                messageDiv.innerText = 'User Login successful!';
+            } 
+            // 3. Fail if neither match
+            else {
                 messageDiv.style.color = 'red';
                 messageDiv.innerText = 'Invalid username or password.';
             }
