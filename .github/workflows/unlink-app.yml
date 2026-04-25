@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Update Database
         run: |
           node -e "
@@ -27,10 +28,11 @@ jobs:
             fs.writeFileSync('ipp.qqf3', JSON.stringify(db, null, 2));
           }
           "
+          
       - name: Push Changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "Ez-Login Bot"
           git add ipp.qqf3
-          git commit -m "Unlinked ${ { github.event.inputs.app_name } } from ${ { github.event.inputs.username } }"
+          git commit -m "Unlinked ${{ github.event.inputs.app_name }} from ${{ github.event.inputs.username }}"
           git push
