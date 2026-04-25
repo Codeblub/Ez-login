@@ -3,52 +3,48 @@ on:
   workflow_dispatch:
     inputs:
       username:
-        description: 'Username to add'
+        description: 'Username'
         required: true
       password:
-        description: 'Password to encrypt'
+        description: 'Password'
         required: true
 
 jobs:
   update-db:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-with: 20
-
-      - name: Encrypt and Update
+      - uses: actions/checkout@v4
+      - name: Encrypt and Save
         run: |
-          # A simple script to update your ipp.qqf3
           node -e "
           const fs = require('fs');
           const crypto = require('crypto');
-          
           const db = JSON.parse(fs.readFileSync('ipp.qqf3', 'utf8'));
+          
+          const user = '${{ github.event.inputs.username }}';
+          const pass = '${{ github.event.inputs.password }}';
           const salt = 'ez-login-salt';
-          const key = crypto.pbkdf2Sync('${{ github.event.inputs.password }}', salt, 100000, 32, 'sha256');
+          
+          const key = crypto.pbkdf2Sync(pass, salt, 100000, 32, 'sha256');
           const iv = crypto.randomBytes(12);
           const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+          
           const encrypted = Buffer.concat([cipher.update('verified', 'utf8'), cipher.final()]);
-          
-          db.users['${{ github.event.inputs.username }}'] = {
-            content: encrypted.toString('base64'),
+          const tag = cipher.getAuthTag();
+          const combined = Buffer.concat([encrypted, tag]);
+
+          db.users[user] = {
+            content: combined.toString('base64'),
             iv: iv.toString('base64'),
-            pfp: 'https://github.com/${{ github.event.inputs.username }}.png',
-            apps: ['Android Sync', 'Web App']
+            pfp: 'https://github.com/' + user + '.png',
+            apps: ['Bmail', 'Android Sync']
           };
-          
           fs.writeFileSync('ipp.qqf3', JSON.stringify(db, null, 2));
           "
-
-      - name: Commit changes
+      - name: Push to Repo
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.name "Ez-Login Bot"
           git add ipp.qqf3
           git commit -m "Added user: ${{ github.event.inputs.username }}"
           git push
