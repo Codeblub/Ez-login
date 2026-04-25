@@ -51,25 +51,34 @@
 
         let loggedInUser = ""; // Temporary storage for the user name
 
-        async function startSync() {
-            const u = document.getElementById('u').value;
-            const p = document.getElementById('p').value;
-            const status = document.getElementById('statusText');
+async function startSync() {
+    const u = document.getElementById('u').value;
+    const p = document.getElementById('p').value;
+    const status = document.getElementById('statusText');
 
-            status.innerText = "Verifying...";
-            
-            const success = await handleWidgetLogin(u, p, appName);
-            
-            if (success) {
-                loggedInUser = u; // Save the name
-                // Hide login, show email choice
-                document.getElementById('login-step').style.display = 'none';
-                document.getElementById('email-choice-section').style.display = 'block';
-            } else {
-                alert("Login Failed");
-                status.innerText = "Signing into";
-            }
-        }
+    status.innerText = "Verifying...";
+    
+    // Change "handleWidgetLogin" to "handleLogin" to match your auth.js
+    const result = await handleLogin(u, p);
+    
+    if (result && result.success) {
+        // 'result.username' comes from your auth.js return statement
+        loggedInUser = result.username; 
+        
+        status.innerText = "Success!";
+        status.style.color = "#28a745";
+
+        // Hide login and show the email choice screen
+        setTimeout(() => {
+            document.getElementById('login-step').style.display = 'none';
+            document.getElementById('email-choice-section').style.display = 'block';
+        }, 800); 
+    } else {
+        alert("Login Failed - Incorrect username or password.");
+        status.innerText = "Signing into";
+        status.style.color = "white";
+    }
+}
 
         function finishAndSend() {
             const prefix = document.getElementById('email-prefix').value;
