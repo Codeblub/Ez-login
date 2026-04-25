@@ -5,54 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ez-Login Dashboard</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --primary: #3b82f6; --danger: #ef4444; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: var(--card); padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 0.75rem; margin: 0.5rem 0; border-radius: 0.5rem; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; margin-top: 1rem; transition: opacity 0.2s; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .box { background: #1e293b; padding: 30px; border-radius: 20px; width: 350px; text-align: center; border: 1px solid #334155; }
+        .pfp { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #3b82f6; margin-bottom: 10px; }
+        .tag { background: #334155; padding: 5px 12px; border-radius: 15px; font-size: 14px; display: inline-flex; align-items: center; margin: 5px; }
+        .remove-btn { margin-left: 8px; color: #ef4444; cursor: pointer; font-weight: bold; }
         .hidden { display: none; }
-        .profile-img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 1rem; border: 3px solid var(--primary); }
-        .tag-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: 1rem; }
-        .tag { background: #334155; padding: 0.4rem 0.8rem; border-radius: 2rem; font-size: 0.85rem; display: flex; align-items: center; transition: background 0.2s; }
-        .tag:hover { background: #475569; }
-        .remove-btn { margin-left: 8px; color: var(--danger); font-weight: bold; cursor: pointer; font-size: 1.1rem; line-height: 1; }
-        .logout { margin-top: 2rem; display: block; color: #94a3b8; text-decoration: none; font-size: 0.9rem; }
+        button { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; }
+        .bmail-link { background: #1e1e1e; border: 1px solid #007bff; padding: 10px; border-radius: 10px; margin-top: 15px; text-align: left; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div id="login-box">
-            <h2 style="margin-top:0">Ez-Login</h2>
-            <input type="text" id="u" placeholder="Username">
-            <input type="password" id="p" placeholder="Password">
-            <button id="login-btn" onclick="login()">Sign In</button>
-            <p style="font-size: 0.9rem; color: #94a3b8;">No account? Use GitHub Actions to create one.</p>
-        </div>
+    <div id="login-box" class="box">
+        <h2>Ez-Login</h2>
+        <input type="text" id="user" placeholder="Username" style="width:90%; padding:10px; margin:10px 0; border-radius:5px; border:none;">
+        <input type="password" id="pass" placeholder="Password" style="width:90%; padding:10px; margin:10px 0; border-radius:5px; border:none;">
+        <button id="login-btn" onclick="login()">Sign In</button>
+    </div>
 
-        <div id="dash-box" class="hidden">
-            <img id="pfp" src="" class="profile-img">
-            <h2 id="name" style="margin: 0 0 0.5rem 0;"></h2>
-            <div class="tag-container" id="apps"></div>
-            <a href="#" class="logout" onclick="location.reload()">[Logout]</a>
-        </div>
+    <div id="dash-box" class="box hidden">
+        <img id="pfp" class="pfp" src="">
+        <h2 id="name">User</h2>
+        <p style="color: #94a3b8;">Linked Apps:</p>
+        <div id="apps"></div>
+        
+        <div id="extra-details"></div>
+
+        <button onclick="location.reload()" style="margin-top:20px; background:#475569;">Logout</button>
     </div>
 
     <script src="security.js"></script>
     <script src="auth.js"></script>
-    
     <script>
         async function login() {
-            const user = document.getElementById('u').value;
-            const pass = document.getElementById('p').value;
+            const user = document.getElementById('user').value;
+            const pass = document.getElementById('pass').value;
             const btn = document.getElementById('login-btn');
 
-            if (!user || !pass) return alert("Please enter credentials");
-
-            btn.disabled = true;
-            btn.innerText = "Authenticating...";
-
+            btn.innerText = "Verifying...";
             const res = await handleLogin(user, pass);
 
             if (res.success) {
@@ -62,35 +53,46 @@
                 document.getElementById('name').innerText = res.username;
                 document.getElementById('pfp').src = res.pfp || `https://github.com/${res.username}.png`;
 
+                // 1. Keep your original App Tags logic
                 const appContainer = document.getElementById('apps');
                 appContainer.innerHTML = "";
-
+                
                 if (res.apps && res.apps.length > 0) {
                     res.apps.forEach(app => {
                         const span = document.createElement('span');
                         span.className = 'tag';
-                        span.innerHTML = `
-                            ${app}
-                            <span class="remove-btn" title="Unlink App" onclick="unlink('${res.username}', '${app}')">×</span>
-                        `;
+                        span.innerHTML = `${app} <span class="remove-btn" title="Unlink" onclick="unlink('${res.username}', '${app}')">×</span>`;
                         appContainer.appendChild(span);
                     });
                 } else {
-                    appContainer.innerHTML = "<p style='color:#94a3b8'>No apps linked.</p>";
+                    appContainer.innerHTML = "<p id='no-apps' style='color:#94a3b8'>No apps linked.</p>";
                 }
+
+                // 2. ADDED: Show the specific @bmail.com address chosen
+                const savedBmail = localStorage.getItem('ez_login_bmail');
+                if (savedBmail) {
+                    const extra = document.getElementById('extra-details');
+                    extra.innerHTML = `
+                        <div class="bmail-link">
+                            <small style="color:#3b82f6; text-transform:uppercase;">Bmail Active</small><br>
+                            <strong>${savedBmail}</strong>
+                        </div>
+                    `;
+                    // Remove the "No apps linked" text if Bmail is there
+                    const noAppsText = document.getElementById('no-apps');
+                    if (noAppsText) noAppsText.style.display = 'none';
+                }
+
             } else {
-                alert("Login failed! Check your username or password.");
-                btn.disabled = false;
+                alert("Login failed!");
                 btn.innerText = "Sign In";
             }
         }
 
         function unlink(username, appName) {
-            if (confirm(`Are you sure you want to unlink ${appName}?`)) {
-                // Since we can't write to GitHub from the browser without a token,
-                // we direct the user to the correct GitHub Action.
+            if (confirm(`Unlink ${appName}?`)) {
                 const actionUrl = `https://github.com/Codeblub/Ez-login/actions/workflows/unlink-app.yml`;
-                alert(`Redirecting to GitHub. Run the 'Unlink App' Action for user '${username}' and app '${appName}'.`);
+                alert(`Redirecting to GitHub Actions to unlink ${appName} for ${username}`);
                 window.open(actionUrl, '_blank');
             }
         }

@@ -82,26 +82,28 @@
             }
         }
 
-        function finishAndSend() {
-            const prefix = document.getElementById('email-prefix').value;
-            if (!prefix) return alert("Please choose a bmail name!");
+function finishAndSend() {
+    const prefix = document.getElementById('email-prefix').value;
+    if (!prefix) return alert("Please choose a bmail name!");
 
-            const fullEmail = prefix + "@bmail.com";
+    const fullEmail = prefix + "@bmail.com";
 
-            // Post message back to bmail index.html
-            window.parent.postMessage({
-                type: 'EZ_LOGIN_SUCCESS',
-                user: loggedInUser,
-                email: fullEmail
-            }, "*"); 
+    // SAVE: Store the chosen email for the Ez-login dashboard to see
+    localStorage.setItem('ez_login_bmail', fullEmail);
 
-            // Final success UI
-            document.body.innerHTML = `
-                <div style='text-align:center; padding-top:40%; color:white;'>
-                    <h1 style="color:#28a745">✓ Verified</h1>
-                    <p>${fullEmail} is ready!</p>
-                </div>`;
-        }
+    // Post message back to bmail index.html
+    window.parent.postMessage({
+        type: 'EZ_LOGIN_SUCCESS',
+        user: loggedInUser,
+        email: fullEmail
+    }, "*"); 
+
+    document.body.innerHTML = `
+        <div style='text-align:center; padding-top:40%; color:white;'>
+            <h1 style="color:#28a745">✓ Verified</h1>
+            <p>${fullEmail} is ready!</p>
+        </div>`;
+}
     </script>
 </body>
 </html>
