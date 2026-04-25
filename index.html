@@ -1,81 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Ez-Login Dashboard</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f9;
-        }
-        .login-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            text-align: center;
-        }
-        h2 { margin-bottom: 20px; color: #333; }
-        input[type="text"], input[type="password"] {
-            width: 90%; padding: 10px; margin: 10px 0;
-            border: 1px solid #ccc; border-radius: 4px;
-        }
-        button {
-            width: 100%; padding: 10px; background-color: #0056b3;
-            color: white; border: none; border-radius: 4px;
-            cursor: pointer; font-size: 16px; margin-top: 10px;
-        }
-        button:hover { background-color: #004494; }
-        #message { margin-top: 15px; font-weight: bold; }
-        .signup-link { margin-top: 20px; font-size: 14px; }
-        .signup-link a { color: #0056b3; text-decoration: none; }
-        .signup-link a:hover { text-decoration: underline; }
+        body { font-family: sans-serif; background: #121212; color: white; display: flex; justify-content: center; padding-top: 50px; }
+        .card { background: #1e1e1e; padding: 30px; border-radius: 15px; width: 350px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: #333; color: white; }
+        button { width: 95%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .hidden { display: none; }
+        .pfp { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #007bff; margin-bottom: 15px; }
+        .tag { background: #007bff22; color: #007bff; padding: 5px 12px; border-radius: 20px; font-size: 13px; margin: 5px; display: inline-block; border: 1px solid #007bff; }
     </style>
 </head>
 <body>
-
-    <div class="login-container">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="attemptLogin()">Login</button>
-        <div id="message"></div>
-        
-        <div class="signup-link">
-            Don't have an account? <a href="up.html">Sign Up here</a>
+    <div class="card">
+        <div id="login-box">
+            <h2>Sign In</h2>
+            <input type="text" id="u" placeholder="Username">
+            <input type="password" id="p" placeholder="Password">
+            <button onclick="login()">Login</button>
+            <p style="font-size: 14px;">Need an account? <a href="up.html" style="color:#007bff">Sign Up</a></p>
+        </div>
+        <div id="dash-box" class="hidden">
+            <img id="pfp" class="pfp" src="">
+            <h2 id="name"></h2>
+            <div id="apps"></div>
+            <button onclick="location.reload()" style="background:#333; margin-top:20px;">Logout</button>
         </div>
     </div>
-
+    <script src="security.js"></script>
+    <script src="auth.js"></script>
     <script>
-        function attemptLogin() {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            const messageDiv = document.getElementById('message');
-
-            // 1. Check the hardcoded Admin credentials
-            if (user === 'Adminconfig' && pass === 'Burtle@123') {
-                messageDiv.style.color = 'green';
-                messageDiv.innerText = 'Admin Login successful!';
-            } 
-            // 2. Check if the user exists in Local Storage (simulated database)
-            else if (localStorage.getItem(user) === pass) {
-                messageDiv.style.color = 'green';
-                messageDiv.innerText = 'User Login successful!';
-            } 
-            // 3. Fail if neither match
-            else {
-                messageDiv.style.color = 'red';
-                messageDiv.innerText = 'Invalid username or password.';
-            }
+        async function login() {
+            const res = await handleLogin(document.getElementById('u').value, document.getElementById('p').value);
+            if(res.success) {
+                document.getElementById('login-box').classList.add('hidden');
+                document.getElementById('dash-box').classList.remove('hidden');
+                document.getElementById('name').innerText = res.username;
+                document.getElementById('pfp').src = res.pfp;
+                res.apps.forEach(a => {
+                    const s = document.createElement('span'); s.className='tag'; s.innerText=a;
+                    document.getElementById('apps').appendChild(s);
+                });
+            } else { alert("Invalid Credentials"); }
         }
     </script>
-
 </body>
 </html>

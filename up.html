@@ -1,90 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
+    <title>Ez-Login | Sign Up</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #e9ecef;
-        }
-        .signup-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            text-align: center;
-        }
-        h2 { margin-bottom: 20px; color: #333; }
-        input[type="text"], input[type="password"] {
-            width: 90%; padding: 10px; margin: 10px 0;
-            border: 1px solid #ccc; border-radius: 4px;
-        }
-        button {
-            width: 100%; padding: 10px; background-color: #28a745;
-            color: white; border: none; border-radius: 4px;
-            cursor: pointer; font-size: 16px; margin-top: 10px;
-        }
-        button:hover { background-color: #218838; }
-        #message { margin-top: 15px; font-weight: bold; }
-        .login-link { margin-top: 20px; font-size: 14px; }
-        .login-link a { color: #0056b3; text-decoration: none; }
-        .login-link a:hover { text-decoration: underline; }
+        body { font-family: sans-serif; background: #121212; color: white; display: flex; justify-content: center; padding-top: 50px; }
+        .card { background: #1e1e1e; padding: 30px; border-radius: 15px; width: 350px; text-align: center; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: #333; color: white; }
+        button { width: 95%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
-
-    <div class="signup-container">
-        <h2>Create Account</h2>
-        <input type="text" id="newUsername" placeholder="Choose a Username">
-        <input type="password" id="newPassword" placeholder="Choose a Password">
-        <button onclick="createAccount()">Sign Up</button>
-        <div id="message"></div>
-        
-        <div class="login-link">
-            Already have an account? <a href="index.html">Back to Login</a>
-        </div>
+    <div class="card">
+        <h2>Register</h2>
+        <input type="text" id="nu" placeholder="Username">
+        <input type="password" id="np" placeholder="Password">
+        <button onclick="signup()">Create Account</button>
+        <p><a href="index.html" style="color:#007bff">Back to Login</a></p>
     </div>
-
+    <script src="security.js"></script>
+    <script src="auth.js"></script>
     <script>
-        function createAccount() {
-            const newUser = document.getElementById('newUsername').value;
-            const newPass = document.getElementById('newPassword').value;
-            const messageDiv = document.getElementById('message');
-
-            // Basic check to ensure fields aren't empty
-            if (newUser === '' || newPass === '') {
-                messageDiv.style.color = 'red';
-                messageDiv.innerText = 'Please fill out both fields.';
-                return;
-            }
-
-            // Check if the username already exists in our "database"
-            if (localStorage.getItem(newUser) !== null || newUser === 'Adminconfig') {
-                messageDiv.style.color = 'red';
-                messageDiv.innerText = 'Username already exists!';
-                return;
-            }
-
-            // Save the new credentials to the browser's Local Storage
-            localStorage.setItem(newUser, newPass);
-
-            messageDiv.style.color = 'green';
-            messageDiv.innerText = 'Account created! Redirecting...';
-
-            // Send the user back to the login page after a 1.5 second delay
-            setTimeout(() => {
-                window.location.href = "index.html";
-            }, 1500);
+        async function signup() {
+            await handleSignup(document.getElementById('nu').value, document.getElementById('np').value);
+            alert("Done!"); window.location.href="index.html";
         }
     </script>
-
 </body>
 </html>
