@@ -1,0 +1,36 @@
+name: Unlink App
+on:
+  workflow_dispatch:
+    inputs:
+      username:
+        description: 'Username'
+        required: true
+      app_name:
+        description: 'App to remove (e.g. Bmail)'
+        required: true
+
+jobs:
+  remove-app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update Database
+        run: |
+          node -e "
+          const fs = require('fs');
+          const db = JSON.parse(fs.readFileSync('ipp.qqf3', 'utf8'));
+          const user = '${{ github.event.inputs.username }}';
+          const app = '${{ github.event.inputs.app_name }}';
+
+          if (db.users[user]) {
+            db.users[user].apps = db.users[user].apps.filter(a => a !== app);
+            fs.writeFileSync('ipp.qqf3', JSON.stringify(db, null, 2));
+          }
+          "
+      - name: Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Ez-Login Bot"
+          git add ipp.qqf3
+          git commit -m "Unlinked ${ { github.event.inputs.app_name } } from ${ { github.event.inputs.username } }"
+          git push
