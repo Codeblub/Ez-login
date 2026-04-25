@@ -3,16 +3,18 @@
 <head>
     <title>Ez-Login Sync</title>
     <style>
+        /* Keeping all your original styling */
         body { font-family: sans-serif; background: #121212; color: white; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
         .widget { width: 100%; max-width: 320px; text-align: center; background: #1e1e1e; padding: 25px; border-radius: 15px; border: 1px solid #333; }
         input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: #333; color: white; }
         button { width: 95%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
+        /* Your Google-style headers */
         h3 { color: #888; margin-bottom: 5px; font-weight: normal; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
         h2 { margin-top: 0; color: #fff; font-size: 24px; }
-        .brand { color: #007bff; font-weight: bold; }
+        .brand { color: #007bff; font-weight: bold; margin-bottom: 10px; }
 
-        /* Style for the new email choice section */
+        /* The new choice section styles */
         #email-choice-section { display: none; margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
         .email-input-group { display: flex; align-items: center; background: #333; border-radius: 8px; padding-left: 10px; margin: 10px 0; }
         .email-input-group input { width: 60%; margin: 0; background: transparent; }
@@ -26,6 +28,7 @@
         <div id="login-step">
             <h3 id="statusText">Signing into</h3>
             <h2 id="appTitle">Loading...</h2>
+            
             <input type="text" id="u" placeholder="Username">
             <input type="password" id="p" placeholder="Password">
             <button onclick="startSync()">Continue to App</button>
@@ -45,40 +48,39 @@
     <script src="security.js"></script>
     <script src="auth.js"></script>
     <script>
+        // Keep your original URL search params logic
         const params = new URLSearchParams(window.location.search);
         const appName = params.get('app') || "Account";
         document.getElementById('appTitle').innerText = appName;
 
-        let loggedInUser = ""; // Temporary storage for the user name
+        let loggedInUser = ""; 
 
-async function startSync() {
-    const u = document.getElementById('u').value;
-    const p = document.getElementById('p').value;
-    const status = document.getElementById('statusText');
+        async function startSync() {
+            const u = document.getElementById('u').value;
+            const p = document.getElementById('p').value;
+            const status = document.getElementById('statusText');
 
-    status.innerText = "Verifying...";
-    
-    // Change "handleWidgetLogin" to "handleLogin" to match your auth.js
-    const result = await handleLogin(u, p);
-    
-    if (result && result.success) {
-        // 'result.username' comes from your auth.js return statement
-        loggedInUser = result.username; 
-        
-        status.innerText = "Success!";
-        status.style.color = "#28a745";
+            status.innerText = "Verifying...";
+            
+            // Calling your handleLogin from auth.js
+            const result = await handleLogin(u, p);
+            
+            if (result && result.success) {
+                loggedInUser = result.username; 
+                status.innerText = "Success!";
+                status.style.color = "#28a745";
 
-        // Hide login and show the email choice screen
-        setTimeout(() => {
-            document.getElementById('login-step').style.display = 'none';
-            document.getElementById('email-choice-section').style.display = 'block';
-        }, 800); 
-    } else {
-        alert("Login Failed - Incorrect username or password.");
-        status.innerText = "Signing into";
-        status.style.color = "white";
-    }
-}
+                // Transition to the email choice instead of closing
+                setTimeout(() => {
+                    document.getElementById('login-step').style.display = 'none';
+                    document.getElementById('email-choice-section').style.display = 'block';
+                }, 800); 
+            } else {
+                alert("Login Failed - Incorrect username or password.");
+                status.innerText = "Signing into";
+                status.style.color = "white";
+            }
+        }
 
         function finishAndSend() {
             const prefix = document.getElementById('email-prefix').value;
@@ -86,17 +88,17 @@ async function startSync() {
 
             const fullEmail = prefix + "@bmail.com";
 
-            // Send the data back to your Bmail site
+            // Post message back to bmail index.html
             window.parent.postMessage({
                 type: 'EZ_LOGIN_SUCCESS',
                 user: loggedInUser,
                 email: fullEmail
-            }, "*"); // For testing, we use "*". In production use your GitHub URL
+            }, "*"); 
 
-            // Show final success
+            // Final success UI
             document.body.innerHTML = `
                 <div style='text-align:center; padding-top:40%; color:white;'>
-                    <h1>✓ All Set</h1>
+                    <h1 style="color:#28a745">✓ Verified</h1>
                     <p>${fullEmail} is ready!</p>
                 </div>`;
         }
