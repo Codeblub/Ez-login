@@ -11,6 +11,15 @@
       "iv": "guxg7SW0l0C2xuvh",
       "pfp": "https://github.com/Codeblub.png",
       "apps": []
+    },
+    "Blub": {
+      "content": "PREHEBaHKsKVO3L61VAbkeuFl0btlNie",
+      "iv": "GcZiBqnX3cZjH1hd",
+      "pfp": "https://github.com/Blub.png",
+      "apps": [
+        "Bmail",
+        "Android Sync"
+      ]
     }
   }
 }
