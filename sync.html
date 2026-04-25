@@ -8,30 +8,48 @@
         input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: #333; color: white; }
         button { width: 95%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        /* The "Google Style" header */
         h3 { color: #888; margin-bottom: 5px; font-weight: normal; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
         h2 { margin-top: 0; color: #fff; font-size: 24px; }
         .brand { color: #007bff; font-weight: bold; }
+
+        /* Style for the new email choice section */
+        #email-choice-section { display: none; margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
+        .email-input-group { display: flex; align-items: center; background: #333; border-radius: 8px; padding-left: 10px; margin: 10px 0; }
+        .email-input-group input { width: 60%; margin: 0; background: transparent; }
+        .domain-tag { color: #888; font-weight: bold; padding-right: 10px; }
     </style>
 </head>
 <body>
     <div class="widget">
         <div class="brand">Ez-Login</div>
-        <h3 id="statusText">Signing into</h3>
-        <h2 id="appTitle">Loading...</h2>
         
-        <input type="text" id="u" placeholder="Username">
-        <input type="password" id="p" placeholder="Password">
-        <button onclick="startSync()">Continue to App</button>
+        <div id="login-step">
+            <h3 id="statusText">Signing into</h3>
+            <h2 id="appTitle">Loading...</h2>
+            <input type="text" id="u" placeholder="Username">
+            <input type="password" id="p" placeholder="Password">
+            <button onclick="startSync()">Continue to App</button>
+        </div>
+
+        <div id="email-choice-section">
+            <h3>Final Step</h3>
+            <h2>Create your @bmail</h2>
+            <div class="email-input-group">
+                <input type="text" id="email-prefix" placeholder="example">
+                <span class="domain-tag">@bmail.com</span>
+            </div>
+            <button onclick="finishAndSend()">Finish Sync</button>
+        </div>
     </div>
 
     <script src="security.js"></script>
     <script src="auth.js"></script>
     <script>
-        // Use URLSearchParams to get the name from the link (?app=Bmail)
         const params = new URLSearchParams(window.location.search);
         const appName = params.get('app') || "Account";
         document.getElementById('appTitle').innerText = appName;
+
+        let loggedInUser = ""; // Temporary storage for the user name
 
         async function startSync() {
             const u = document.getElementById('u').value;
@@ -40,25 +58,38 @@
 
             status.innerText = "Verifying...";
             
-            // This function is in your auth.js
             const success = await handleWidgetLogin(u, p, appName);
             
             if (success) {
-                status.innerText = "Success! Redirecting...";
-                status.style.color = "#28a745";
-                
-                setTimeout(() => {
-                    if (window.opener) {
-                        window.close(); // Closes popup
-                    } else {
-                        // Shows success in iframe
-                        document.body.innerHTML = "<div style='text-align:center; padding-top:40%;'><h1>✓ Verified</h1><p>Returning to " + appName + "</p></div>";
-                    }
-                }, 1000);
+                loggedInUser = u; // Save the name
+                // Hide login, show email choice
+                document.getElementById('login-step').style.display = 'none';
+                document.getElementById('email-choice-section').style.display = 'block';
             } else {
                 alert("Login Failed");
                 status.innerText = "Signing into";
             }
+        }
+
+        function finishAndSend() {
+            const prefix = document.getElementById('email-prefix').value;
+            if (!prefix) return alert("Please choose a bmail name!");
+
+            const fullEmail = prefix + "@bmail.com";
+
+            // Send the data back to your Bmail site
+            window.parent.postMessage({
+                type: 'EZ_LOGIN_SUCCESS',
+                user: loggedInUser,
+                email: fullEmail
+            }, "*"); // For testing, we use "*". In production use your GitHub URL
+
+            // Show final success
+            document.body.innerHTML = `
+                <div style='text-align:center; padding-top:40%; color:white;'>
+                    <h1>✓ All Set</h1>
+                    <p>${fullEmail} is ready!</p>
+                </div>`;
         }
     </script>
 </body>
