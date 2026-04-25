@@ -1,0 +1,25 @@
+<div id="ez-sync-container">
+    <iframe 
+        id="ez-frame"
+        src="https://codeblub.github.io/Ez-login/sync.html?app=Bmail" 
+        style="width: 350px; height: 500px; border: 1px solid #333; border-radius: 15px;">
+    </iframe>
+</div>
+
+<script>
+    // Listen for the "EZ_LOGIN_SUCCESS" message
+    window.addEventListener("message", (event) => {
+        // Security check: Only allow messages from your domain
+        if (event.origin !== "https://codeblub.github.io") return;
+
+        if (event.data.type === 'EZ_LOGIN_SUCCESS') {
+            console.log("Synced account:", event.data.user);
+            
+            // Hide the iframe since we are done
+            document.getElementById('ez-sync-container').innerHTML = 
+                `<h2>Successfully Synced with ${event.data.user}!</h2>`;
+            
+            // Now Bmail knows who you are!
+        }
+    });
+</script>

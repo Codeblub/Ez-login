@@ -19,3 +19,25 @@ async function handleLogin(user, pass) {
     }
     return { success: false };
 }
+// Add/Update this in auth.js
+async function handleWidgetLogin(user, pass, appTitle) {
+    const res = await handleLogin(user, pass);
+    if (res.success) {
+        const messageData = {
+            type: 'EZ_LOGIN_SUCCESS',
+            user: user,
+            app: appTitle
+        };
+
+        // 1. Check for Popup
+        if (window.opener) {
+            window.opener.postMessage(messageData, "*"); 
+        } 
+        // 2. Check for Iframe
+        else if (window.parent !== window) {
+            window.parent.postMessage(messageData, "*");
+        }
+        return true;
+    }
+    return false;
+}
