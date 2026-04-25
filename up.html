@@ -20,10 +20,22 @@
     <script src="security.js"></script>
     <script src="auth.js"></script>
     <script>
-        async function signup() {
-            await handleSignup(document.getElementById('nu').value, document.getElementById('np').value);
-            alert("Done!"); window.location.href="index.html";
-        }
+function signup() {
+    const user = document.getElementById('nu').value;
+    const pass = document.getElementById('np').value;
+
+    if (!user || !pass) {
+        alert("Please fill in both fields.");
+        return;
+    }
+
+    // This link takes you directly to the 'Run Workflow' UI on GitHub
+    const githubActionUrl = "https://github.com/Codeblub/Ez-login/actions/workflows/add-user.yml";
+    
+    alert(`Redirecting to GitHub to securely create user: ${user}.\n\nPaste the username and password into the 'Run Workflow' box there.`);
+    
+    window.open(githubActionUrl, '_blank');
+}
     </script>
 </body>
 </html>

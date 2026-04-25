@@ -31,19 +31,38 @@
     <script src="security.js"></script>
     <script src="auth.js"></script>
     <script>
-        async function login() {
-            const res = await handleLogin(document.getElementById('u').value, document.getElementById('p').value);
-            if(res.success) {
-                document.getElementById('login-box').classList.add('hidden');
-                document.getElementById('dash-box').classList.remove('hidden');
-                document.getElementById('name').innerText = res.username;
-                document.getElementById('pfp').src = res.pfp;
-                res.apps.forEach(a => {
-                    const s = document.createElement('span'); s.className='tag'; s.innerText=a;
-                    document.getElementById('apps').appendChild(s);
-                });
-            } else { alert("Invalid Credentials"); }
-        }
+async function login() {
+    const user = document.getElementById('u').value;
+    const pass = document.getElementById('p').value;
+    const loginBox = document.getElementById('login-box');
+    const dashBox = document.getElementById('dash-box');
+
+    // Show a loading state
+    document.querySelector('button').innerText = "Authenticating...";
+
+    const res = await handleLogin(user, pass);
+
+    if(res.success) {
+        loginBox.classList.add('hidden');
+        dashBox.classList.remove('hidden');
+        
+        document.getElementById('name').innerText = res.username;
+        document.getElementById('pfp').src = res.pfp;
+        
+        // Clear old tags and add new ones from ipp.qqf3
+        const appContainer = document.getElementById('apps');
+        appContainer.innerHTML = ""; 
+        res.apps.forEach(a => {
+            const s = document.createElement('span'); 
+            s.className = 'tag'; 
+            s.innerText = a;
+            appContainer.appendChild(s);
+        });
+    } else { 
+        alert("Login Failed: User not found or incorrect password.");
+        document.querySelector('button').innerText = "Login";
+    }
+}
     </script>
 </body>
 </html>
