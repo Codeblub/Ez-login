@@ -10,10 +10,7 @@
       "content": "1KMmNKkZSbGFtUVy0bQqhxzpgeS/MF5A",
       "iv": "guxg7SW0l0C2xuvh",
       "pfp": "https://github.com/Codeblub.png",
-      "apps": [
-        "Bmail",
-        "Android Sync"
-      ]
+      "apps"[]
     }
   }
 }
